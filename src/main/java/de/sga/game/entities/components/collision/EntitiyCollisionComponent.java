@@ -4,10 +4,14 @@ import de.sga.game.Game;
 import de.sga.game.entities.BaseEntity;
 import de.sga.game.entities.Hitbox;
 import de.sga.game.entities.components.AbstractEntitiyComponent;
+import de.sga.game.entities.components.position.EntityPositionComponent;
 import lombok.Getter;
 import org.joml.Vector3f;
 
 import java.util.*;
+
+import static de.sga.game.entities.components.position.EntityPositionComponent.HorizontalMovementDirection.LEFT;
+import static de.sga.game.entities.components.position.EntityPositionComponent.HorizontalMovementDirection.RIGHT;
 
 public class EntitiyCollisionComponent extends AbstractEntitiyComponent {
 
@@ -20,12 +24,12 @@ public class EntitiyCollisionComponent extends AbstractEntitiyComponent {
             hitbox = comp.getHitbox();
         });
 
-        if(hitbox == null){
+        if (hitbox == null) {
             throw new IllegalStateException("No hitbox for collision detection!");
         }
     }
 
-    public Optional<Float> isHit(boolean vertical, boolean right) {
+    public boolean isAnyHit() {
         entity.getComponent(EntitiyHitboxComponent.class).ifPresent(EntitiyHitboxComponent::updateHitbox);
 
         Collection<Hitbox> allBoxes = new ArrayList<>(Game.theGame().entities)
@@ -34,33 +38,86 @@ public class EntitiyCollisionComponent extends AbstractEntitiyComponent {
                 .map(EntitiyHitboxComponent::getHitbox)
                 .toList();
 
-        for(var other:allBoxes){
+        for (var other : allBoxes) {
             if (other != hitbox) {
                 boolean leftCollision = hitbox.getXMin() < other.getXMax();
-                boolean rightCollision =  hitbox.getXMax() > other.getXMin();
+                boolean rightCollision = hitbox.getXMax() > other.getXMin();
                 boolean hitX = rightCollision && leftCollision;
                 boolean hitY = hitbox.getYMin() < other.getYMax() &&
                         hitbox.getYMax() > other.getYMin();
 
-                if( hitX && hitY){
-                    if(vertical){
-                        if(right) {
-                            float heigth = hitbox.getYMax() - hitbox.getYMin();
-                            return Optional.of(other.getYMin() - heigth);
-                        }else{
-                            return Optional.of(other.getYMax());
-                        }
-                    }else{
-                        float width = hitbox.getXMax() - hitbox.getXMin();
-                        if(right){
-                            return Optional.of(other.getXMin() - (width/2));
-                        }else{
-                            return Optional.of(other.getXMax() + (width/2));
-                        }
-                   }
+                return hitX && hitY;
+            }
+        }
+        return false;
+    }
+
+    public Optional<Float> isHorizontalHit(EntityPositionComponent.HorizontalMovementDirection direction) {
+        entity.getComponent(EntitiyHitboxComponent.class).ifPresent(EntitiyHitboxComponent::updateHitbox);
+
+        Collection<Hitbox> allBoxes = new ArrayList<>(Game.theGame().entities)
+                .stream()
+                .flatMap(e -> e.getComponent(EntitiyHitboxComponent.class).stream())
+                .map(EntitiyHitboxComponent::getHitbox)
+                .toList();
+
+        for (var other : allBoxes) {
+            if (other != hitbox) {
+                boolean leftCollision = hitbox.getXMin() < other.getXMax();
+                boolean rightCollision = hitbox.getXMax() > other.getXMin();
+                boolean hitX = rightCollision && leftCollision;
+                boolean hitY = hitbox.getYMin() < other.getYMax() &&
+                        hitbox.getYMax() > other.getYMin();
+
+                if (hitX && hitY) {
+                    float width = hitbox.getXMax() - hitbox.getXMin();
+                    return switch (direction) {
+                        case RIGHT -> Optional.of(other.getXMin() - (width / 2));
+                        case LEFT -> Optional.of(other.getXMax() + (width / 2));
+                        default -> Optional.empty();
+                    };
                 }
             }
         }
+        return Optional.empty();
+    }
+
+    public Optional<Float> isVerticalHit(EntityPositionComponent.VerticalMovementDirection direction) {
+        entity.getComponent(EntitiyHitboxComponent.class).ifPresent(EntitiyHitboxComponent::updateHitbox);
+
+        Collection<Hitbox> allBoxes = new ArrayList<>(Game.theGame().entities)
+                .stream()
+                .flatMap(e -> e.getComponent(EntitiyHitboxComponent.class).stream())
+                .map(EntitiyHitboxComponent::getHitbox)
+                .toList();
+
+        for (var other : allBoxes) {
+            if (other != hitbox) {
+                boolean leftCollision = hitbox.getXMin() < other.getXMax();
+                boolean rightCollision = hitbox.getXMax() > other.getXMin();
+                boolean hitX = rightCollision && leftCollision;
+                boolean hitY = hitbox.getYMin() < other.getYMax() &&
+                        hitbox.getYMax() > other.getYMin();
+
+                if (hitX && hitY) {
+                    switch (direction) {
+                        case UP -> {
+                            float height = hitbox.getYMax() - hitbox.getYMin();
+                            return Optional.of(other.getYMin() - height);
+                        }
+
+                        case DOWN -> {
+                            return Optional.of(other.getYMax());
+                        }
+
+                        default -> {
+                            return Optional.empty();
+                        }
+                    }
+                }
+            }
+        }
+
         return Optional.empty();
     }
 
@@ -73,26 +130,26 @@ public class EntitiyCollisionComponent extends AbstractEntitiyComponent {
                 .map(EntitiyHitboxComponent::getHitbox)
                 .toList();
 
-        for(var other:allBoxes){
+        for (var other : allBoxes) {
             if (other != hitbox) {
                 boolean leftCollision = hitbox.getXMin() < other.getXMax();
-                boolean rightCollision =  hitbox.getXMax() > other.getXMin();
+                boolean rightCollision = hitbox.getXMax() > other.getXMin();
                 boolean hitX = rightCollision && leftCollision;
                 boolean hitY = hitbox.getYMin() < other.getYMax() &&
                         hitbox.getYMax() > other.getYMin();
 
-                if( hitX && hitY){
+                if (hitX && hitY) {
                     // hit
                     // x is definitely part of the normed space of the other hitbox.
                     float otherWidth = other.getXMax() - other.getXMin();
-                    if(hitbox.getXMin() > other.getXMin()){
+                    if (hitbox.getXMin() > other.getXMin()) {
                         // collision - we come from the right side
                         float overlapping = other.getXMax() - hitbox.getXMin();
-                        return new Vector3f(overlapping+0.05f,0,0);
-                    }else{
+                        return new Vector3f(overlapping + 0.05f, 0, 0);
+                    } else {
                         // we come from the left side
                         float overlapping = other.getXMin() - hitbox.getXMax();
-                        return new Vector3f(overlapping-0.05f,0,0);
+                        return new Vector3f(overlapping - 0.05f, 0, 0);
                     }
                 }
             }
@@ -100,7 +157,7 @@ public class EntitiyCollisionComponent extends AbstractEntitiyComponent {
         return new Vector3f();
     }
 
-    public Optional<Hitbox> getHitHitbox(){
+    public Optional<Hitbox> getHitHitbox() {
         return new ArrayList<>(Game.theGame().entities)
                 .stream()
                 .flatMap(e -> e.getComponent(EntitiyHitboxComponent.class).stream())
