@@ -61,7 +61,7 @@ public class MainMenu implements Scene {
     }
 
     private Ball createBall(){
-        RawModel model = OBJLoader.loadModel("/de/sga/renderer/models/ball.obj");
+        RawModel model = OBJLoader.loadModel("/de/sga/renderer/models/ball-3d.obj");
         ModelTexture ballTexture = new ModelTexture(EntitiyLoader.loadTexture("/de/sga/renderer/textures/ball.png"), 10, 0, 1);
         TexturedModel ballTexturedModel = new TexturedModel(model, ballTexture);
         Ball ball = new Ball(new Vector3f(0), ballTexturedModel);

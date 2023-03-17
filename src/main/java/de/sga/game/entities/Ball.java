@@ -9,7 +9,7 @@ import org.joml.Vector3f;
 
 import java.util.Random;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class Ball extends BaseEntity {
 

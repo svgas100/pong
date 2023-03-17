@@ -45,7 +45,7 @@ public final class Display {
     }
 
     public void init(){
-        windowId = glfwCreateWindow(1024, 800, "Game", NULL, NULL);
+        windowId = glfwCreateWindow(1024, 800, "Pong", NULL, NULL);
         if (windowId == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
