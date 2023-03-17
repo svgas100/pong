@@ -1,6 +1,6 @@
 package de.sga.game.entities.components.movement;
 
-import de.sga.game.entities.Entity;
+import de.sga.game.entities.BaseEntity;
 import de.sga.game.entities.components.AbstractEntitiyComponent;
 import de.sga.game.entities.components.position.EntityPositionComponent;
 import lombok.Getter;
@@ -44,7 +44,7 @@ public class EntityMovementComponent extends AbstractEntitiyComponent {
 
     private final Vector3f movement = new Vector3f();
 
-    public EntityMovementComponent(Entity entity, float maxSpeed, float maxAcceleration, boolean decay, boolean invertMovementOnHit) {
+    public EntityMovementComponent(BaseEntity entity, float maxSpeed, float maxAcceleration, boolean decay, boolean invertMovementOnHit) {
         super(entity);
         this.maxAcceleration = maxAcceleration;
         this.maxSpeed = maxSpeed;
@@ -103,21 +103,22 @@ public class EntityMovementComponent extends AbstractEntitiyComponent {
         AtomicReference<Float> yDecay = new AtomicReference<>((float) 0);
         if(movement.y < 0.05 && movement.y > -0.05){
             yDecay.set(0f);
-            movement.set(movement.x,0,movement.z);
+            movement.set(movement.x,0f,movement.z );
         }else {
             if (movement.y < 0) {
                 yDecay.set(Math.max(movement.y, -0.25F));
-
             } else if (movement.y > 0) {
                 yDecay.set(min(movement.y, 0.25F));
             }
         }
 
-            if ( entity.getPositionComponent().isGrounded()) {
-                xDecay.set(xDecay.get()/2.0F);
-                yDecay.set(yDecay.get()/2.0F);
-            }
+        if( comp.isVerticalHit()){
+            yDecay.set(movement.y);
+        }
 
+        if(comp.isHorizontalHit()){
+            xDecay.set(movement.x);
+        }
 
         movement.sub(new Vector3f(xDecay.get(), yDecay.get(), 0));
     }
@@ -154,9 +155,6 @@ public class EntityMovementComponent extends AbstractEntitiyComponent {
 
     private float getSpeedChange() {
         AtomicReference<Float> speedChange = new AtomicReference<>(maxAcceleration);
-      if( entity.getPositionComponent().isGrounded()){
-                speedChange.set(maxAcceleration / 2.0F);
-            }
         return speedChange.get();
     }
 }

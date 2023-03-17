@@ -8,12 +8,10 @@ import lombok.Setter;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import java.sql.Array;
 import java.util.*;
-import java.util.function.Supplier;
 
 @Getter
-public class Entity {
+public class BaseEntity {
 
     protected EntityPositionComponent positionComponent;
 
@@ -29,15 +27,15 @@ public class Entity {
     protected Vector3f rotation;
     protected float scale;
 
-    public Entity(){
+    public BaseEntity(){
     }
 
-    public Entity(Vector3f position){
+    public BaseEntity(Vector3f position){
         positionComponent = createPositionComponent(position);
         components.add(positionComponent);
     }
 
-    public Entity(TexturedModel model, Vector3f position, Vector3f rotation, float scale, int textureIndex) {
+    public BaseEntity(TexturedModel model, Vector3f position, Vector3f rotation, float scale, int textureIndex) {
         this(position);
         this.model = model;
         this.rotation = rotation;

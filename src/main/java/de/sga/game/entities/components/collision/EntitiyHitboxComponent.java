@@ -1,6 +1,6 @@
 package de.sga.game.entities.components.collision;
 
-import de.sga.game.entities.Entity;
+import de.sga.game.entities.BaseEntity;
 import de.sga.game.entities.Hitbox;
 import de.sga.game.entities.components.AbstractEntitiyComponent;
 import de.sga.game.entities.util.EntitiyLoader;
@@ -17,13 +17,13 @@ public class EntitiyHitboxComponent extends AbstractEntitiyComponent {
     @Getter
     private boolean debug = false;
 
-    public EntitiyHitboxComponent(Entity entity, float sizeX, float sizeY, float offsetX) {
+    public EntitiyHitboxComponent(BaseEntity entity, float sizeX, float sizeY, float offsetX) {
         super(entity);
         ModelTexture modelTexture = new ModelTexture(EntitiyLoader.loadTexture("/de/sga/renderer/textures/border.png"), 10, 0, 1);
         hitbox = new Hitbox(sizeX, sizeY, offsetX, entity, modelTexture);
     }
 
-    public EntitiyHitboxComponent(Entity entity, float sizeX, float sizeY) {
+    public EntitiyHitboxComponent(BaseEntity entity, float sizeX, float sizeY) {
         this(entity,sizeX,sizeY,0);
     }
 

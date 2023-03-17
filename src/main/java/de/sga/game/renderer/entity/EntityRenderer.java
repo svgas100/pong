@@ -1,12 +1,9 @@
 package de.sga.game.renderer.entity;
 
-import de.sga.game.entities.Entity;
+import de.sga.game.entities.BaseEntity;
 import de.sga.game.entities.Hitbox;
-import de.sga.game.entities.components.collision.EntitiyCollisionComponent;
 import de.sga.game.entities.components.collision.EntitiyHitboxComponent;
-import de.sga.game.entities.components.position.EntityPositionComponent;
 import de.sga.game.entities.models.TexturedModel;
-import de.sga.game.entities.util.EntitiyLoader;
 import de.sga.game.framework.utils.MatrixUtil;
 import de.sga.game.renderer.shaders.StaticShader;
 import de.sga.game.renderer.textures.ModelTexture;
@@ -33,8 +30,8 @@ public class EntityRenderer {
     }
 
 
-    public void renderEntities(Map<TexturedModel, List<Entity>> entityBatches) {
-        for (Map.Entry<TexturedModel, List<Entity>> batch : entityBatches.entrySet()) {
+    public void renderEntities(Map<TexturedModel, List<BaseEntity>> entityBatches) {
+        for (Map.Entry<TexturedModel, List<BaseEntity>> batch : entityBatches.entrySet()) {
             if (batch.getKey() == null) {
                 continue;
             }

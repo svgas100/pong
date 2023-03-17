@@ -9,10 +9,9 @@ import org.joml.Vector3f;
 
 import java.util.Random;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 
-public class Ball extends Entity{
+public class Ball extends BaseEntity {
 
     private final static Random r = new Random(123);
 

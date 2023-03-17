@@ -39,7 +39,7 @@ public class Game {
 
     private MasterRenderComponent renderComponent;
 
-    public Set<Entity> entities = Collections.synchronizedSet( new HashSet<>());
+    public Set<BaseEntity> entities = Collections.synchronizedSet( new HashSet<>());
 
     public void start() {
         init();
@@ -148,20 +148,20 @@ public class Game {
 
     }
 
-    public void renderLogic(Camera camera, Light light, Set<Entity> entities, Scene level) {
+    public void renderLogic(Camera camera, Light light, Set<BaseEntity> entities, Scene level) {
         if (display.isResized()) {
             renderComponent.updateProjectionMatrix();
         }
 
-        for (Entity entity : entities) {
+        for (BaseEntity entity : entities) {
             renderComponent.processEntity(entity);
         }
-        
+
         renderComponent.render(light, camera);
         glfwSwapBuffers(display.getWindowId());
     }
 
-    private void gameLogic(Set<Entity> entities) {
+    private void gameLogic(Set<BaseEntity> entities) {
         new HashSet<>(entities).stream().flatMap(e -> e.getComponents().stream()).forEach(EntityComponent::onTick);
     }
 }

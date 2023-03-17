@@ -1,7 +1,7 @@
 package de.sga.game.entities.components.collision;
 
 import de.sga.game.Game;
-import de.sga.game.entities.Entity;
+import de.sga.game.entities.BaseEntity;
 import de.sga.game.entities.Hitbox;
 import de.sga.game.entities.components.AbstractEntitiyComponent;
 import lombok.Getter;
@@ -14,7 +14,7 @@ public class EntitiyCollisionComponent extends AbstractEntitiyComponent {
     @Getter
     private Hitbox hitbox;
 
-    public EntitiyCollisionComponent(Entity entity) {
+    public EntitiyCollisionComponent(BaseEntity entity) {
         super(entity);
         entity.getComponent(EntitiyHitboxComponent.class).ifPresent(comp -> {
             hitbox = comp.getHitbox();

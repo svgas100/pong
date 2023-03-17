@@ -7,7 +7,7 @@ import de.sga.game.entities.components.movement.EntityMovementComponent;
 import de.sga.game.entities.models.TexturedModel;
 import org.joml.Vector3f;
 
-public class Player extends Entity{
+public class Player extends BaseEntity {
 
     public Player(Vector3f worldPosition, TexturedModel texturedModel, int downKey, int upKey) {
         super(texturedModel, worldPosition, new Vector3f(0), 1F, 0);

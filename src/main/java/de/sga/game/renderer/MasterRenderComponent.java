@@ -1,7 +1,7 @@
 package de.sga.game.renderer;
 
 import de.sga.game.entities.Camera;
-import de.sga.game.entities.Entity;
+import de.sga.game.entities.BaseEntity;
 import de.sga.game.entities.Light;
 import de.sga.game.entities.models.TexturedModel;
 import de.sga.game.renderer.entity.EntityRenderer;
@@ -28,7 +28,7 @@ public class MasterRenderComponent {
 
     private EntityRenderer entityRenderer;
 
-    private final Map<TexturedModel, List<Entity>> entityBatches = new HashMap<>();
+    private final Map<TexturedModel, List<BaseEntity>> entityBatches = new HashMap<>();
 
     public MasterRenderComponent(){init();
     }
@@ -58,9 +58,9 @@ public class MasterRenderComponent {
         TextMaster.render();
     }
 
-    public void processEntity(Entity entity) {
+    public void processEntity(BaseEntity entity) {
         TexturedModel model = entity.getModel();
-        List<Entity> batch = entityBatches.computeIfAbsent(model, (m) -> new ArrayList<>());
+        List<BaseEntity> batch = entityBatches.computeIfAbsent(model, (m) -> new ArrayList<>());
         batch.add(entity);
     }
 

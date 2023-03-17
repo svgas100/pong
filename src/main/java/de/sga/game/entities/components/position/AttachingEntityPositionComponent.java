@@ -1,11 +1,11 @@
 package de.sga.game.entities.components.position;
 
-import de.sga.game.entities.Entity;
+import de.sga.game.entities.BaseEntity;
 import org.joml.Vector3f;
 
 public class AttachingEntityPositionComponent extends EntityPositionComponent {
 
-    public AttachingEntityPositionComponent(Entity entity,Vector3f position) {
+    public AttachingEntityPositionComponent(BaseEntity entity, Vector3f position) {
         super(entity,position);
     }
 

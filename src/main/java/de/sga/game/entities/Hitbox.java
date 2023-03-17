@@ -1,20 +1,17 @@
 package de.sga.game.entities;
 
-import de.sga.game.entities.components.collision.EntitiyCollisionComponent;
 import de.sga.game.entities.components.position.AttachingEntityPositionComponent;
-import de.sga.game.entities.components.position.EntityPositionComponent;
 import de.sga.game.entities.models.RawModel;
 import de.sga.game.entities.models.TexturedModel;
 import de.sga.game.entities.util.EntitiyLoader;
 import de.sga.game.renderer.textures.ModelTexture;
 import lombok.Getter;
-import lombok.Setter;
 import org.joml.Vector3f;
 
-public class Hitbox extends Entity {
+public class Hitbox extends BaseEntity {
 
     @Getter
-    private final Entity boundEntity;
+    private final BaseEntity boundEntity;
 
     private static final int VERTEX_COUNT = 2;
 
@@ -44,7 +41,7 @@ public class Hitbox extends Entity {
         return new Vector3f();
     }
 
-    public Hitbox(float sizeX, float sizeY, float offsetX, Entity bound, ModelTexture texture) {
+    public Hitbox(float sizeX, float sizeY, float offsetX, BaseEntity bound, ModelTexture texture) {
         components.add(new AttachingEntityPositionComponent(this,new Vector3f(bound.getPositionComponent().getPosition().sub(
                 new Vector3f((sizeX / 2.0F + offsetX) * bound.getScale(), 0, 0)))));
 

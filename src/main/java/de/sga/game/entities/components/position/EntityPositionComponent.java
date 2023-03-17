@@ -1,6 +1,6 @@
 package de.sga.game.entities.components.position;
 
-import de.sga.game.entities.Entity;
+import de.sga.game.entities.BaseEntity;
 import de.sga.game.entities.Hitbox;
 import de.sga.game.entities.components.AbstractEntitiyComponent;
 import de.sga.game.entities.components.collision.EntitiyCollisionComponent;
@@ -32,7 +32,7 @@ public class EntityPositionComponent extends AbstractEntitiyComponent {
     @Getter
     protected  Hitbox hitHitbox = null;
 
-    public EntityPositionComponent(Entity entity, Vector3f intitalPosition) {
+    public EntityPositionComponent(BaseEntity entity, Vector3f intitalPosition) {
         super(entity);
         position = new Vector3f(intitalPosition);
     }
@@ -106,7 +106,7 @@ public class EntityPositionComponent extends AbstractEntitiyComponent {
                     float yThis = position.y; // original position
 
                     if(yThis >= yOther){
-                        float yDiff = yThis -yOther + 0.01F;
+                        float yDiff = yOther - yThis + 0.01F;
                         position.add(0,yDiff,0);
                     }
                     verticalHit = true;

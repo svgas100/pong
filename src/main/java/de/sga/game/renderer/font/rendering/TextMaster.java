@@ -1,12 +1,10 @@
 package de.sga.game.renderer.font.rendering;
 
-import de.sga.game.entities.Entity;
 import de.sga.game.entities.util.EntitiyLoader;
 import de.sga.game.renderer.font.mesh.FontType;
 import de.sga.game.renderer.font.mesh.GUIText;
 import de.sga.game.renderer.font.mesh.TextMeshData;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
