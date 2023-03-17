@@ -1,17 +1,15 @@
-package de.sga.game.entities.components.collision;
+package de.sga.game.entities.components.physics.collision;
 
 import de.sga.game.Game;
 import de.sga.game.entities.BaseEntity;
 import de.sga.game.entities.Hitbox;
 import de.sga.game.entities.components.AbstractEntitiyComponent;
-import de.sga.game.entities.components.position.EntityPositionComponent;
+import de.sga.game.entities.components.physics.movement.HorizontalMovementDirection;
+import de.sga.game.entities.components.physics.movement.VerticalMovementDirection;
 import lombok.Getter;
 import org.joml.Vector3f;
 
 import java.util.*;
-
-import static de.sga.game.entities.components.position.EntityPositionComponent.HorizontalMovementDirection.LEFT;
-import static de.sga.game.entities.components.position.EntityPositionComponent.HorizontalMovementDirection.RIGHT;
 
 public class EntitiyCollisionComponent extends AbstractEntitiyComponent {
 
@@ -52,7 +50,7 @@ public class EntitiyCollisionComponent extends AbstractEntitiyComponent {
         return false;
     }
 
-    public Optional<Float> isHorizontalHit(EntityPositionComponent.HorizontalMovementDirection direction) {
+    public Optional<Float> isHorizontalHit(HorizontalMovementDirection direction) {
         entity.getComponent(EntitiyHitboxComponent.class).ifPresent(EntitiyHitboxComponent::updateHitbox);
 
         Collection<Hitbox> allBoxes = new ArrayList<>(Game.theGame().entities)
@@ -82,7 +80,7 @@ public class EntitiyCollisionComponent extends AbstractEntitiyComponent {
         return Optional.empty();
     }
 
-    public Optional<Float> isVerticalHit(EntityPositionComponent.VerticalMovementDirection direction) {
+    public Optional<Float> isVerticalHit(VerticalMovementDirection direction) {
         entity.getComponent(EntitiyHitboxComponent.class).ifPresent(EntitiyHitboxComponent::updateHitbox);
 
         Collection<Hitbox> allBoxes = new ArrayList<>(Game.theGame().entities)

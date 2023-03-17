@@ -1,8 +1,9 @@
-package de.sga.game.entities.components.movement;
+package de.sga.game.entities.components.physics.movement;
 
 import de.sga.game.entities.BaseEntity;
 import de.sga.game.entities.components.AbstractEntitiyComponent;
-import de.sga.game.entities.components.position.EntityPositionComponent;
+import de.sga.game.entities.components.physics.collision.CollisionListenerComponent;
+import de.sga.game.entities.components.physics.EntityPositionComponent;
 import lombok.Getter;
 import org.joml.Vector3f;
 
@@ -10,7 +11,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.Math.min;
 
-public class EntityMovementComponent extends AbstractEntitiyComponent {
+public class EntityMovementComponent extends AbstractEntitiyComponent implements CollisionListenerComponent {
 
     /**
      * Describes the maxmimal speed at which the entity assigned to this component may move.
@@ -38,9 +39,13 @@ public class EntityMovementComponent extends AbstractEntitiyComponent {
     @Getter
     private boolean didMove = false;
 
-    private boolean decay = false;
+    private boolean decay;
 
-    private boolean invertMovementOnHit = false;
+    private boolean invertMovementOnHit;
+
+    private boolean hitX =false;
+
+    private boolean hitY = false;
 
     private final Vector3f movement = new Vector3f();
 
@@ -68,12 +73,12 @@ public class EntityMovementComponent extends AbstractEntitiyComponent {
             var comp = entity.getPositionComponent();
 
             Vector3f colMovement = new Vector3f();
-            if(comp.isHorizontalHit()) {
+            if(hitX) {
                 colMovement.add(-movement.x*2,0,0);
                 movement.set(-movement.x,movement.y,movement.z);
             }
 
-            if(comp.isVerticalHit()){
+            if(hitY){
                 colMovement.add(0,-movement.y*2,0);
                 movement.set(movement.x,-movement.y,movement.z);
             }
@@ -84,12 +89,15 @@ public class EntityMovementComponent extends AbstractEntitiyComponent {
         if(decay) {
             decayMovement();
         }
+
+        hitX = false;
+        hitY = false;
     }
 
     private void decayMovement() {
         var comp = entity.getPositionComponent();
         AtomicReference<Float> xDecay = new AtomicReference<>((float) 0);
-        if((movement.x < 0.05 && movement.x > -0.05) || comp.isHorizontalHit()){
+        if((movement.x < 0.05 && movement.x > -0.05) || hitX){
             xDecay.set(0f);
             movement.set(0f,movement.y,movement.z);
         }else {
@@ -101,7 +109,7 @@ public class EntityMovementComponent extends AbstractEntitiyComponent {
         }
 
         AtomicReference<Float> yDecay = new AtomicReference<>((float) 0);
-        if(movement.y < 0.05 && movement.y > -0.05){
+        if(movement.y < 0.05 && movement.y > -0.05 || hitY){
             yDecay.set(0f);
             movement.set(movement.x,0f,movement.z );
         }else {
@@ -112,11 +120,11 @@ public class EntityMovementComponent extends AbstractEntitiyComponent {
             }
         }
 
-        if( comp.isVerticalHit()){
+        if(hitX){
             yDecay.set(movement.y);
         }
 
-        if(comp.isHorizontalHit()){
+        if(hitY){
             xDecay.set(movement.x);
         }
 
@@ -156,5 +164,15 @@ public class EntityMovementComponent extends AbstractEntitiyComponent {
     private float getSpeedChange() {
         AtomicReference<Float> speedChange = new AtomicReference<>(maxAcceleration);
         return speedChange.get();
+    }
+
+    @Override
+    public void xCollision(HorizontalMovementDirection direction) {
+        hitX = true;
+    }
+
+    @Override
+    public void yCollision(VerticalMovementDirection direction) {
+        hitY = true;
     }
 }

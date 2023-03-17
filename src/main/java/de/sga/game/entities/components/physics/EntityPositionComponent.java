@@ -1,19 +1,17 @@
-package de.sga.game.entities.components.position;
+package de.sga.game.entities.components.physics;
 
 import de.sga.game.entities.BaseEntity;
 import de.sga.game.entities.components.AbstractEntitiyComponent;
-import de.sga.game.entities.components.collision.EntitiyCollisionComponent;
-import de.sga.game.entities.components.collision.EntitiyHitboxComponent;
-import lombok.Getter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import de.sga.game.entities.components.physics.collision.CollisionListenerComponent;
+import de.sga.game.entities.components.physics.collision.EntitiyCollisionComponent;
+import de.sga.game.entities.components.physics.collision.EntitiyHitboxComponent;
+import de.sga.game.entities.components.physics.movement.HorizontalMovementDirection;
+import de.sga.game.entities.components.physics.movement.VerticalMovementDirection;
 import org.joml.Vector3f;
 
 import java.util.Optional;
 
 public class EntityPositionComponent extends AbstractEntitiyComponent {
-
-    Logger LOGGER = LogManager.getLogger();
 
     /**
      * The current position of the entity managed by this component.
@@ -28,30 +26,6 @@ public class EntityPositionComponent extends AbstractEntitiyComponent {
      */
     protected Vector3f positionChange = new Vector3f();
 
-
-    /**
-     * {@code true} in case the current {@link #positionChange#x} could not be executed without colliding with another entity.
-     * {@code false} otherwise.
-     * <p>
-     *    <ul>
-     *        <li><b>both</b> entites need a {@link EntitiyCollisionComponent} in order to be "hittable"</li>
-     *    </ul>
-     * </p>
-     */
-    @Getter
-    protected boolean horizontalHit = false;
-
-    /**
-     * {@code true} in case the current {@link #positionChange#y} could not be executed without colliding with another entity.
-     * {@code false} otherwise.
-     * <p>
-     *    <ul>
-     *        <li><b>both</b> entites need a {@link EntitiyCollisionComponent} in order to be "hittable"</li>
-     *    </ul>
-     * </p>
-     */
-    @Getter
-    protected boolean verticalHit = false;
     public EntityPositionComponent(BaseEntity entity, Vector3f initialPosition) {
         super(entity);
         position = new Vector3f(initialPosition);
@@ -92,7 +66,7 @@ public class EntityPositionComponent extends AbstractEntitiyComponent {
             }
         }
 
-        entity.getComponent(EntitiyHitboxComponent.class).ifPresent(EntitiyHitboxComponent::updateHitbox);
+        getComponent(EntitiyHitboxComponent.class).ifPresent(EntitiyHitboxComponent::updateHitbox);
     }
     @Override
     public void onTick() {
@@ -106,16 +80,19 @@ public class EntityPositionComponent extends AbstractEntitiyComponent {
             // and then vertically
             performYMovement();
 
+            //TODO eventually we need Z-Movement as well
+
             // ideally we would have no collision anymore but sometimes the entity "glitches" into other entities.
             // we therefore add a force in order to push them apart.
-            if (getCollisionComponent().get().isAnyHit()) {
+            if (useCollisionComponent().isAnyHit()) {
                 position.add(useCollisionComponent().pushingForce());
             }
         }
 
         // we update the hitbox of the entity (in case it is present) in order to have a consistent collision detection
         // between all entities.
-        entity.getComponent(EntitiyHitboxComponent.class).ifPresent(EntitiyHitboxComponent::updateHitbox);
+        getComponent(EntitiyHitboxComponent.class)
+                .ifPresent(EntitiyHitboxComponent::updateHitbox);
 
         positionChange = new Vector3f();
     }
@@ -123,37 +100,22 @@ public class EntityPositionComponent extends AbstractEntitiyComponent {
         position.add(positionChange.x, 0, 0);
         var horizontalMovDirection = HorizontalMovementDirection.getDirectionFromChange(positionChange);
         var isHit = useCollisionComponent().isHorizontalHit(horizontalMovDirection);
-        horizontalHit = isHit.isPresent();
-        if (!horizontalHit) {
+        if (isHit.isEmpty()) {
             return;
         }
         adjustHorizontalMovement(isHit.get(),horizontalMovDirection);
+        notifyOthersAboutXCollision(horizontalMovDirection);
     }
 
     private void performYMovement() {
         position.add(0, positionChange.y, 0);
         var verticalMovDirection = VerticalMovementDirection.getDirectionFromChange(positionChange);
         var isHit = useCollisionComponent().isVerticalHit(verticalMovDirection);
-        verticalHit = isHit.isPresent();
-        if (!verticalHit) {
+        if (isHit.isEmpty()) {
             return;
         }
         adjustVerticalMovement(isHit.get(), verticalMovDirection);
-    }
-
-    private void adjustVerticalMovement(float yHitEntity, VerticalMovementDirection verticalMovDirection) {
-        float pushDirection = switch (verticalMovDirection) {
-            case DOWN -> 0.01F;
-            case UP -> -0.01F;
-            default -> 0f;
-        };
-
-        // revert to previous movement
-        position.sub(0, positionChange.y, 0);
-
-        // we try to move just before the actually hit entity
-        float yDiff = yHitEntity - position.y + pushDirection;
-        position.add(0, yDiff, 0);
+        notifyOthersAboutYCollision(verticalMovDirection);
     }
 
     private void adjustHorizontalMovement(float xHitEntity, HorizontalMovementDirection horizontalMovDirection) {
@@ -171,36 +133,33 @@ public class EntityPositionComponent extends AbstractEntitiyComponent {
         position.add(xDiff, 0, 0);
     }
 
-    public enum VerticalMovementDirection {
-        UP,
-        DOWN,
+    private void adjustVerticalMovement(float yHitEntity, VerticalMovementDirection verticalMovDirection) {
+        float pushDirection = switch (verticalMovDirection) {
+            case DOWN -> 0.01F;
+            case UP -> -0.01F;
+            default -> 0f;
+        };
 
-        NONE;
+        // revert to previous movement
+        position.sub(0, positionChange.y, 0);
 
-        static VerticalMovementDirection getDirectionFromChange(Vector3f positionChangeVector) {
-            if (positionChangeVector.y > 0) {
-                return UP;
-            } else if (positionChangeVector.y < 0) {
-                return DOWN;
-            }
-            return NONE;
-        }
+        // we try to move just before the actually hit entity
+        float yDiff = yHitEntity - position.y + pushDirection;
+        position.add(0, yDiff, 0);
     }
 
-    public enum HorizontalMovementDirection {
-        LEFT,
-        RIGHT,
+    private void notifyOthersAboutXCollision(HorizontalMovementDirection direction){
+        getComponents().stream()
+                .filter(CollisionListenerComponent.class::isInstance)
+                .map(CollisionListenerComponent.class::cast)
+                .forEach(l -> l.xCollision(direction));
+    }
 
-        NONE;
-
-        static HorizontalMovementDirection getDirectionFromChange(Vector3f positionChangeVector) {
-            if (positionChangeVector.x > 0) {
-                return RIGHT;
-            } else if (positionChangeVector.x < 0) {
-                return LEFT;
-            }
-            return NONE;
-        }
+    private void notifyOthersAboutYCollision(VerticalMovementDirection direction){
+        getComponents().stream()
+                .filter(CollisionListenerComponent.class::isInstance)
+                .map(CollisionListenerComponent.class::cast)
+                .forEach(l -> l.yCollision(direction));
     }
 
     private EntitiyCollisionComponent useCollisionComponent(){
@@ -208,7 +167,7 @@ public class EntityPositionComponent extends AbstractEntitiyComponent {
     }
 
     public Optional<EntitiyCollisionComponent> getCollisionComponent() {
-        return entity.getComponent(EntitiyCollisionComponent.class);
+        return getComponent(EntitiyCollisionComponent.class);
     }
 
     @Override

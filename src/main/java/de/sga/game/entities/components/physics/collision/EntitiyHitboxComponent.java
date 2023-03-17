@@ -1,4 +1,4 @@
-package de.sga.game.entities.components.collision;
+package de.sga.game.entities.components.physics.collision;
 
 import de.sga.game.entities.BaseEntity;
 import de.sga.game.entities.Hitbox;

@@ -1,7 +1,7 @@
 package de.sga.game.entities;
 
 import de.sga.game.entities.components.EntityComponent;
-import de.sga.game.entities.components.position.EntityPositionComponent;
+import de.sga.game.entities.components.physics.EntityPositionComponent;
 import de.sga.game.entities.models.TexturedModel;
 import lombok.Getter;
 import lombok.Setter;

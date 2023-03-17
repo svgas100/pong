@@ -1,6 +1,6 @@
 package de.sga.game.entities;
 
-import de.sga.game.entities.components.position.AttachingEntityPositionComponent;
+import de.sga.game.entities.components.physics.AttachingEntityPositionComponent;
 import de.sga.game.entities.models.RawModel;
 import de.sga.game.entities.models.TexturedModel;
 import de.sga.game.entities.util.EntitiyLoader;
@@ -68,17 +68,21 @@ public class Hitbox extends BaseEntity {
 
         float rot;
         if(super.getRotation().equals(new Vector3f())){
-             rot = 1;
+            rot = 1;
         }else{
             rot = -1;
         }
 
+        // move the hitbox
         getPositionComponent().setPosition(
                 new Vector3f(boundEntity.getPositionComponent().getPosition().sub(
                         new Vector3f((sizeX / 2.0F + (rot * offsetX)) * boundEntity.getScale(), 0, 0))));
+
+        // get the new position of the attached entity
         float x = boundEntity.getPositionComponent().getPosition().x;
         float y = boundEntity.getPositionComponent().getPosition().y;
 
+        // update the hitbo bounds
         xMin = x - ((sizeX / 2.0F + (rot * offsetX)) * boundEntity.getScale());
         xMax = x + ((sizeX / 2.0F - (rot * offsetX)) * boundEntity.getScale());
         yMin = y;

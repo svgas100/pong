@@ -1,4 +1,4 @@
-package de.sga.game.entities.components.position;
+package de.sga.game.entities.components.physics;
 
 import de.sga.game.entities.BaseEntity;
 import org.joml.Vector3f;

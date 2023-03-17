@@ -1,9 +1,9 @@
 package de.sga.game.entities;
 
-import de.sga.game.entities.components.collision.EntitiyCollisionComponent;
-import de.sga.game.entities.components.collision.EntitiyHitboxComponent;
+import de.sga.game.entities.components.physics.collision.EntitiyCollisionComponent;
+import de.sga.game.entities.components.physics.collision.EntitiyHitboxComponent;
 import de.sga.game.entities.components.input.AbstractEntityKeyboardComponent;
-import de.sga.game.entities.components.movement.EntityMovementComponent;
+import de.sga.game.entities.components.physics.movement.EntityMovementComponent;
 import de.sga.game.entities.models.TexturedModel;
 import org.joml.Vector3f;
 
